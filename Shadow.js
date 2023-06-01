@@ -514,12 +514,13 @@ class Engine{
             this.canvas.width = xy.x;
             this.canvas.height = xy.y;
         }
-        this.gl = this.canvas.getContext("webgl2", { alpha: false });
+        this.gl = this.canvas.getContext("webgl2", { alpha: true });
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.depthFunc(this.gl.LEQUAL);
         this.gl.enable(this.gl.CULL_FACE);
+        this.gl.enable(this.gl.BLEND);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.fov = 120;
         this.pos = new vec3(0.0, 0.0, 0.0);
@@ -673,8 +674,8 @@ class Engine{
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.mainFramebuffer);
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         if(this.alreadycleared === false){
+            this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
             this.gl.clearColor(this.clearcol.x, this.clearcol.y, this.clearcol.z, 1.0);
-            //this.gl.colorMask(false, false, false, true);
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT);
             if(this.playerphysics === true){
                 this.pos.y += this.playerforce;
@@ -1063,6 +1064,7 @@ class ParticleSystem{
             xt+=xs;
         }
         this.randomfall = false;
+        this.repeat = true;
     }
     Draw(baseMesh, eng){
         for(var i = 0; i != this.meshPos.length; i+=1){
@@ -1077,9 +1079,17 @@ class ParticleSystem{
                 this.meshPos[i].y -= Math.random()*this.force;
             }
             if(this.meshPos[i].y <= this.min && this.force > 0){
-                this.meshPos[i].y = this.max;
+                if(this.repeat){
+                    this.meshPos[i].y = this.max;
+                }else{
+                    this.meshPos[i].y = this.min;
+                }
             }else if(this.meshPos[i].y >= this.min && this.force < 0){
-                this.meshPos[i].y = this.max;
+                if(this.repeat){
+                    this.meshPos[i].y = this.max;
+                }else{
+                    this.meshPos[i].y = this.min;
+                }
             }
         }
     }
