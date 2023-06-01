@@ -79,7 +79,7 @@ function main(){
     eng.canvas.addEventListener("touchstart", begtouch);
     eng.canvas.addEventListener("touchend", endtouch);
 
-    var tst = new ParticleSystem(2, 2, 3, -2, 5, -2, -1, 0.1);
+    var tst = new ParticleSystem(2, 2, 3, -2, 5, -2, -1, 0.15);
     tst.randomfall = true;
     
     mousecallback();

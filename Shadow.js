@@ -1074,7 +1074,7 @@ class ParticleSystem{
             if(this.randomfall === false){
                 this.meshPos[i].y -= this.force;
             }else{
-                this.meshPos[i].y -= Math.random()<this.force;
+                this.meshPos[i].y -= Math.random()*this.force;
             }
             if(this.meshPos[i].y <= this.min){
                 this.meshPos[i].y = this.max;
