@@ -1,4 +1,4 @@
- shadow.js
+#shadow.js  
 3d engine for your web site
 it is simple to integrate, can show a good graphics, allow to write your custom shaders, and a lot of fun with shadows!
 main feature is that you can mix shadowpass with main pass to get multiple shadow maps, or even, render diferent shadows for an object, like a box that casts a sphere as shadow
