@@ -51,5 +51,6 @@ shadowmap fov, far, or even use orthographic projection, where sfov will be the 
     
 ![Screenshot from 2023-04-10 15-03-15](https://user-images.githubusercontent.com/48290199/230928960-1eb206a4-f85a-4606-ad74-3a4fb5e61a88.png)
 
-i added an additional float to transmit different values, and random valuea for other cool effects
-and thats all, even basic physisc for player and collisiiopn will be here, so have fun!
+particle system added, now you can create different particels, for snow/rain and other.
+
+![image](https://github.com/VitionVlad/shadow.js/assets/48290199/72bde637-575d-4c00-90fe-dccbd763f822)
