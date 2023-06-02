@@ -1065,8 +1065,9 @@ class ParticleSystem{
         }
         this.randomfall = false;
         this.repeat = true;
+        this.direction = 0;
     }
-    Draw(baseMesh, eng){
+    Drawy(baseMesh, eng){
         for(var i = 0; i != this.meshPos.length; i+=1){
             baseMesh.pos.x = this.meshPos[i].x;
             baseMesh.pos.y = this.meshPos[i].y;
@@ -1091,6 +1092,76 @@ class ParticleSystem{
                     this.meshPos[i].y = this.min;
                 }
             }
+        }
+    }
+    Drawx(baseMesh, eng){
+        for(var i = 0; i != this.meshPos.length; i+=1){
+            baseMesh.pos.x = this.meshPos[i].x;
+            baseMesh.pos.y = this.meshPos[i].y;
+            baseMesh.pos.z = this.meshPos[i].z;
+            baseMesh.collision = false;
+            baseMesh.Draw(eng);
+            if(this.randomfall === false){
+                this.meshPos[i].x -= this.force;
+            }else{
+                this.meshPos[i].x -= Math.random()*this.force;
+            }
+            if(this.meshPos[i].x <= this.min && this.force > 0){
+                if(this.repeat){
+                    this.meshPos[i].x = this.max;
+                }else{
+                    this.meshPos[i].x = this.min;
+                }
+            }else if(this.meshPos[i].x >= this.min && this.force < 0){
+                if(this.repeat){
+                    this.meshPos[i].x = this.max;
+                }else{
+                    this.meshPos[i].x = this.min;
+                }
+            }
+        }
+    }
+    Drawz(baseMesh, eng){
+        for(var i = 0; i != this.meshPos.length; i+=1){
+            baseMesh.pos.x = this.meshPos[i].x;
+            baseMesh.pos.y = this.meshPos[i].y;
+            baseMesh.pos.z = this.meshPos[i].z;
+            baseMesh.collision = false;
+            baseMesh.Draw(eng);
+            if(this.randomfall === false){
+                this.meshPos[i].z -= this.force;
+            }else{
+                this.meshPos[i].z -= Math.random()*this.force;
+            }
+            if(this.meshPos[i].z <= this.min && this.force > 0){
+                if(this.repeat){
+                    this.meshPos[i].z = this.max;
+                }else{
+                    this.meshPos[i].z = this.min;
+                }
+            }else if(this.meshPos[i].z >= this.min && this.force < 0){
+                if(this.repeat){
+                    this.meshPos[i].z = this.max;
+                }else{
+                    this.meshPos[i].z = this.min;
+                }
+            }
+        }
+    }
+    Draw(baseMesh, eng){
+        switch(this.direction){
+            case 0:
+                this.Drawy(baseMesh, eng);
+                break;
+            case 1:
+                this.Drawx(baseMesh, eng);
+                break;
+            case 2:
+                this.Drawz(baseMesh, eng);
+                break;
+            default:
+                this.Drawy(baseMesh, eng);
+                break;
         }
     }
 }
