@@ -502,6 +502,9 @@ class Engine{
     toRadians(degrees){
         return degrees * Math.PI/180;
     }
+    getVersion(){
+        return "2.0";
+    }
     constructor(id, postprocesfrag, resizetoscreen, autorotate, shadowres){
         this.canvas = document.querySelector(id);
         if(resizetoscreen === true){
@@ -737,6 +740,28 @@ class cubeMap{
     }
 }
 
+class TexUniform{
+    constructor(pixels, resx, resy, engineh){
+        this.texture = engineh.gl.createTexture();
+        engineh.gl.bindTexture(engineh.gl.TEXTURE_2D, this.texture);
+        engineh.gl.texImage2D(engineh.gl.TEXTURE_2D, 0, engineh.gl.RGBA, resx, resy, 0, engineh.gl.RGBA, engineh.gl.UNSIGNED_BYTE, pixels);
+        engineh.gl.generateMipmap(engineh.gl.TEXTURE_2D);
+        engineh.gl.texParameteri(engineh.gl.TEXTURE_2D, engineh.gl.TEXTURE_MIN_FILTER, engineh.gl.LINEAR_MIPMAP_LINEAR);
+        engineh.gl.texParameteri(engineh.gl.TEXTURE_2D, engineh.gl.TEXTURE_MAG_FILTER, engineh.gl.LINEAR);
+        engineh.gl.texParameteri(engineh.gl.TEXTURE_2D, engineh.gl.TEXTURE_WRAP_S, engineh.gl.MIRRORED_REPEAT);
+        engineh.gl.texParameteri(engineh.gl.TEXTURE_2D, engineh.gl.TEXTURE_WRAP_T, engineh.gl.MIRRORED_REPEAT);
+        engineh.gl.bindTexture(engineh.gl.TEXTURE_2D, null);
+    }
+}
+
+class Uniform{
+    constructor(val, name){
+        this.type = val.constructor.name;
+        this.val = val;
+        this.name = name;
+    }
+}
+
 class Mesh{
     vecmatmult(vec, mat){
         var tof = new vec3(0.0, 0.0, 0.0);
@@ -840,7 +865,8 @@ class Mesh{
         engineh.gl.bindTexture(engineh.gl.TEXTURE_2D, null);
         this.aabb = new vec3(0.0, 0.0, 0.0);
         this.interacting = false;
-        this.additionalval = 0;
+        this.additionaluniform = null;
+        this.texnum = 1;
     }
     CalcAABB(){
         this.aabb.x = 0;
@@ -976,7 +1002,38 @@ class Mesh{
 
             engineh.gl.uniform1f(engineh.gl.getUniformLocation(this.shaderprog, "random"), Math.random());
 
-            engineh.gl.uniform1f(engineh.gl.getUniformLocation(this.shaderprog, "additionalvalue"), this.additionalval);
+            if(this.additionaluniform !== null){
+                for(var i = 0; i != this.additionaluniform.length; i+=1){
+                    switch(this.additionaluniform[i]){
+                        case "Number":
+                            engineh.gl.uniform1f(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), this.additionaluniform[i].val);
+                            break;
+                        case "vec2":
+                            engineh.gl.uniform2f(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), this.additionaluniform[i].val.x, this.additionaluniform[i].val.y);
+                            break;
+                        case "vec3":
+                            engineh.gl.uniform3f(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), this.additionaluniform[i].val.x, this.additionaluniform[i].val.y, this.additionaluniform[i].val.z);
+                            break;
+                        case "mat4":
+                            engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), this.additionaluniform[i].val.mat);
+                            break;
+                        case "TexUniform":
+                            engineh.gl.uniform1i(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), 5+this.texnum);
+                            engineh.gl.activeTexture(engineh.gl.TEXTURE5+this.texnum);
+                            engineh.gl.bindTexture(engineh.gl.TEXTURE_2D, this.additionaluniform[i].val.texture);
+                            this.texnum+=1;
+                            break;
+                        case "cubeMap":
+                            engineh.gl.uniform1i(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), 5+this.texnum);
+                            engineh.gl.activeTexture(engineh.gl.TEXTURE5+this.texnum);
+                            engineh.gl.bindTexture(engineh.gl.TEXTURE_CUBE_MAP, this.additionaluniform[i].val.texture);
+                            this.texnum+=1;
+                            break;
+                    }
+                }
+            }
+
+            this.texnum=0;
 
             engineh.gl.bindBuffer(engineh.gl.ARRAY_BUFFER, this.uBuf);
             engineh.gl.enableVertexAttribArray(this.uvLoc);
