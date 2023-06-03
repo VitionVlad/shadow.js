@@ -54,3 +54,15 @@ shadowmap fov, far, or even use orthographic projection, where sfov will be the 
 particle system added, now you can create different particles, for snow/rain and other.
 
 ![image](https://github.com/VitionVlad/shadow.js/assets/48290199/72bde637-575d-4c00-90fe-dccbd763f822)
+
+now, you can pass an Uniform class to an additionaluniform field in mesh (array requiered) and get as many as you want uniforms with different values (vec2, vec3, mat4, float, textures, cubemaps)
+
+![image](https://github.com/VitionVlad/shadow.js/assets/48290199/08fd815d-a687-45a3-87a8-7137961f62ad)
+
+![image](https://github.com/VitionVlad/shadow.js/assets/48290199/579a2c30-c5c9-4ed8-9a3c-a1b4235c7fcb)
+
+and use it like this:
+
+    var uni = new Uniform(333);
+    mesh.additionaluniform = new Array([uni]);
+
