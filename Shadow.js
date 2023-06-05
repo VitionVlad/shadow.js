@@ -1004,7 +1004,7 @@ class Mesh{
 
             if(this.additionaluniform !== null){
                 for(var i = 0; i != this.additionaluniform.length; i+=1){
-                    switch(this.additionaluniform[i]){
+                    switch(this.additionaluniform[i].type){
                         case "Number":
                             engineh.gl.uniform1f(engineh.gl.getUniformLocation(this.shaderprog, this.additionaluniform[i].name), this.additionaluniform[i].val);
                             break;
@@ -1028,6 +1028,9 @@ class Mesh{
                             engineh.gl.activeTexture(engineh.gl.TEXTURE5+this.texnum);
                             engineh.gl.bindTexture(engineh.gl.TEXTURE_CUBE_MAP, this.additionaluniform[i].val.texture);
                             this.texnum+=1;
+                            break;
+                        default:
+                            Error("unefined type of uniform");
                             break;
                     }
                 }
