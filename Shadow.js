@@ -279,6 +279,7 @@ uniform mat4 proj;
 uniform mat4 trans;
 uniform mat4 rotx;
 uniform mat4 roty;
+uniform mat4 rotz;
 uniform mat4 mtrans;
 uniform mat4 mrotx;
 uniform mat4 mroty;
@@ -288,6 +289,7 @@ uniform mat4 sproj;
 uniform mat4 strans;
 uniform mat4 srotx;
 uniform mat4 sroty;
+uniform mat4 srotz;
 out vec2 xy;
 out vec3 norm;
 out float dep;
@@ -298,11 +300,11 @@ void main(){
     vec4 fin = mscale * vec4(positions, 1.0);
     fin = mtrans * mroty * mrotx * mrotz * fin;
     posit = fin.xyz;
-    fin = proj * roty * rotx * trans * fin;
+    fin = proj * rotz * roty * rotx * trans * fin;
     gl_Position = fin;
     fin = mscale * vec4(positions, 1.0);
     fin = mtrans * mroty * mrotx * mrotz * fin;
-    fin = sproj * sroty * srotx * strans * fin;
+    fin = sproj * srotz * sroty * srotx * strans * fin;
     str = fin;
     dep = fin.z;
     xy = uv;
@@ -346,6 +348,7 @@ uniform mat4 proj;
 uniform mat4 trans;
 uniform mat4 rotx;
 uniform mat4 roty;
+uniform mat4 rotz;
 uniform mat4 mtrans;
 uniform mat4 mrotx;
 uniform mat4 mroty;
@@ -357,7 +360,7 @@ out vec3 posit;
 void main(){
     vec4 fin = mscale * vec4(positions, 1.0);
     fin = mtrans * mroty * mrotx * mrotz * fin;
-    fin = proj * roty * rotx * trans * fin;
+    fin = proj * rotz * roty * rotx * trans * fin;
     gl_Position = fin.xyww;
     xy = uv;
     norm = normals;
@@ -503,7 +506,7 @@ class Engine{
         return degrees * Math.PI/180;
     }
     getVersion(){
-        return "2.0";
+        return "2.1";
     }
     constructor(id, postprocesfrag, resizetoscreen, autorotate, shadowres){
         this.canvas = document.querySelector(id);
@@ -529,7 +532,7 @@ class Engine{
         this.pos = new vec3(0.0, 0.0, 0.0);
         this.lpos = new vec3(0.0, 0.0, 0.0);
         this.camsize = new vec3(0.1, 1.7, 0.1);
-        this.rot = new vec2(0.0, 0.0);
+        this.rot = new vec3(0.0, 0.0, 0.0);
         this.vsSource = `#version 300 es
         const vec2 screenplane[6] = vec2[](
             vec2(-1, -1),
@@ -556,6 +559,7 @@ class Engine{
         uniform mat4 trans;
         uniform mat4 rotx;
         uniform mat4 roty;
+        uniform mat4 rotz;
         uniform mat4 mtrans;
         uniform mat4 mrotx;
         uniform mat4 mroty;
@@ -564,7 +568,7 @@ class Engine{
         void main(){
             vec4 fin = mscale * vec4(positions, 1.0);
             fin = mtrans * mroty * mrotx * mrotz * fin;
-            fin = proj * roty * rotx * trans * fin;
+            fin = proj * rotz * roty * rotx * trans * fin;
             gl_Position = fin;
         }
         `;
@@ -590,7 +594,7 @@ class Engine{
 
         this.shadowmapresolution = shadowres;
         this.shadowpos = new vec3(0, 0, 0);
-        this.shadowrot = new vec2(0, 0);
+        this.shadowrot = new vec3(0, 0, 0);
         this.sfov = 90;
         this.snear = 0.1;
         this.sfar = 100.0;
@@ -928,6 +932,10 @@ class Mesh{
             engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, "srotx"), false, this.meshMat.mat);
 
             this.meshMat.clearmat();
+            this.meshMat.buildzrotmat(engineh.shadowrot.z);
+            engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, "srotz"), false, this.meshMat.mat);
+
+            this.meshMat.clearmat();
             if(engineh.useortho === false){
                 this.meshMat.buildperspectivemat(engineh.fov, 0.1, engineh.far, engineh.gl.canvas.width/engineh.gl.canvas.height);
             }else{
@@ -950,6 +958,10 @@ class Mesh{
             this.meshMat.clearmat();
             this.meshMat.buildyrotmat(-engineh.rot.x);
             engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, "rotx"), false, this.meshMat.mat);
+
+            this.meshMat.clearmat();
+            this.meshMat.buildzrotmat(engineh.rot.z);
+            engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, "rotz"), false, this.meshMat.mat);
 
             this.meshMat.clearmat();
             this.meshMat.buildxrotmat(this.rot.x);
@@ -1082,6 +1094,10 @@ class Mesh{
             this.meshMat.clearmat();
             this.meshMat.buildyrotmat(-engineh.shadowrot.x);
             engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(engineh.shadowprog, "rotx"), false, this.meshMat.mat);
+
+            this.meshMat.clearmat();
+            this.meshMat.buildzrotmat(engineh.shadowrot.z);
+            engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(engineh.shadowprog, "rotz"), false, this.meshMat.mat);
 
             this.meshMat.clearmat();
             this.meshMat.buildxrotmat(this.rot.x);
