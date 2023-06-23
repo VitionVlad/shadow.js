@@ -66,3 +66,8 @@ and use it like this:
     var uni = new Uniform(333);
     mesh.additionaluniform = new Array([uni]);
 
+
+Now you can add simple physiscs for meshes via the prop class, it has mass, and uses two meshes, one will interact with other.
+
+    var prop1 = new Prop(0.1);
+    prop1.MeshMeshInteract(mesh2, mesh);
