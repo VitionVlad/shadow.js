@@ -506,7 +506,7 @@ class Engine{
         return degrees * Math.PI/180;
     }
     getVersion(){
-        return "2.1";
+        return "2.2";
     }
     constructor(id, postprocesfrag, resizetoscreen, autorotate, shadowres){
         this.canvas = document.querySelector(id);
@@ -1239,5 +1239,31 @@ class ParticleSystem{
                 this.Drawy(baseMesh, eng);
                 break;
         }
+    }
+}
+
+class Prop{
+    between(x, n1, n2){
+        return x >= n1 && x <= n2;
+    }
+    constructor(mass){
+        this.mass = mass;
+        this.lastPos = new vec3(0, 0, 0);
+    }
+    meshaabb(mesh1, mesh2){
+        if(this.between(mesh2.pos.x, mesh1.pos.x - mesh1.aabb.x - mesh2.aabb.x, mesh1.pos.x + mesh1.aabb.x + mesh2.aabb.x)&&this.between(mesh2.pos.y, mesh1.pos.y - mesh1.aabb.y, mesh1.aabb.y+mesh1.pos.y+ mesh2.aabb.y)&&this.between(mesh2.pos.z, mesh1.pos.z-mesh1.aabb.z- mesh2.aabb.z, mesh1.aabb.z+mesh1.pos.z+ mesh2.aabb.z)){
+            mesh2.pos.y = this.lastPos.y;
+            if(this.between(mesh2.pos.y, mesh1.pos.y - mesh1.aabb.y, mesh1.aabb.y+mesh1.pos.y+ mesh2.aabb.y/2)){
+                mesh2.pos.x = this.lastPos.x;
+                mesh2.pos.z = this.lastPos.z;
+            }
+        }
+    }
+    MeshMeshInteract(interactWith, toInteract){
+        toInteract.pos.y -= this.mass;
+        this.meshaabb(interactWith, toInteract);
+        this.lastPos.x = toInteract.pos.x;
+        this.lastPos.y = toInteract.pos.y;
+        this.lastPos.z = toInteract.pos.z;
     }
 }
