@@ -302,13 +302,15 @@ void main(){
     posit = fin.xyz;
     fin = proj * rotz * roty * rotx * trans * fin;
     gl_Position = fin;
+    mat4 rot = mroty * mrotx * mrotz;
+    mat3 m3x = mat3(rot);
+    norm = m3x * normals;
     fin = mscale * vec4(positions, 1.0);
     fin = mtrans * mroty * mrotx * mrotz * fin;
     fin = sproj * srotz * sroty * srotx * strans * fin;
     str = fin;
     dep = fin.z;
-    xy = uv;
-    norm = normals;
+    xy = vec2(uv.x, uv.y+1.0);
     mat3 vTBN = transpose(mat3(
         normalize(ntangent),
         normalize(cross(normals, ntangent)),
