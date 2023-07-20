@@ -508,13 +508,46 @@ class Engine{
         return degrees * Math.PI/180;
     }
     getVersion(){
-        return "2.2";
+        return "2.3";
+    }
+    mainpassfrm(){
+        this.mainFramebuffer = this.gl.createFramebuffer();
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.mainFramebuffer);
+        this.torendertex = this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.torendertex);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, Number(window.screen.width * this.scalefactor), Number(window.screen.height * this.scalefactor), 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
+        console.log(window.screen.width);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.depthBuffer = this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthBuffer);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT32F, Number(window.screen.width * this.scalefactor), Number(window.screen.height * this.scalefactor), 0, this.gl.DEPTH_COMPONENT, this.gl.FLOAT, null);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.torendertex, 0)
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthBuffer, 0);
+    }
+    shfrm(){
+        this.shadowfr = this.gl.createFramebuffer();
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.shadowfr);
+        this.shadowtex = this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowtex);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT32F, this.shadowmapresolution, this.shadowmapresolution, 0, this.gl.DEPTH_COMPONENT, this.gl.FLOAT, null);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.shadowtex, 0);
     }
     constructor(id, postprocesfrag, scalefactor, shadowres){
         this.canvas = document.querySelector(id);
-        var xy = new vec2(Number(window.screen.width * scalefactor), Number(window.screen.height * scalefactor));
-        this.canvas.width = xy.x;
-        this.canvas.height = xy.y;
+        this.scalefactor = scalefactor;
+        this.canvas.width = window.screen.width;
+        this.canvas.height = window.screen.height;
         this.gl = this.canvas.getContext("webgl2", { alpha: true });
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -568,24 +601,7 @@ class Engine{
         }
         `;
         this.finalprog = this.initShaderProgram(this.vsSource, postprocesfrag);
-        this.mainFramebuffer = this.gl.createFramebuffer();
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.mainFramebuffer);
-        this.torendertex = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.torendertex);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.canvas.width, this.gl.canvas.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.depthBuffer = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthBuffer);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT32F, this.gl.canvas.width, this.gl.canvas.height, 0, this.gl.DEPTH_COMPONENT, this.gl.FLOAT, null);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.torendertex, 0)
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.depthBuffer, 0);
+        this.mainpassfrm();
 
         this.shadowmapresolution = shadowres;
         this.shadowpos = new vec3(0, 0, 0);
@@ -596,16 +612,7 @@ class Engine{
         this.isshadowpass = false;
         this.shadowprog = this.initShaderProgram(this.vsShadow, this.fsShadow);
         this.positionLoc = this.gl.getAttribLocation(this.shadowprog, "positions");
-        this.shadowfr = this.gl.createFramebuffer();
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.shadowfr);
-        this.shadowtex = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowtex);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT32F, this.shadowmapresolution, this.shadowmapresolution, 0, this.gl.DEPTH_COMPONENT, this.gl.FLOAT, null);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.TEXTURE_2D, this.shadowtex, 0);
+        this.shfrm();
         this.useorthosh = false;
 
         this.lightposes = new Float32Array([
@@ -639,6 +646,7 @@ class Engine{
         this.alreadyfall = false;
         this.clearcol = new vec3(0, 0, 0);
         this.alreadycleared = false;
+        this.renewsh = false;
     }
     aabbPlayer(meshPos, meshBorder, enableColision){
         var toreturn  = false;
@@ -674,7 +682,7 @@ class Engine{
     beginFrame(){
         this.isshadowpass = false;
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.mainFramebuffer);
-        this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        this.gl.viewport(0, 0, Number(window.screen.width * this.scalefactor), Number(window.screen.height * this.scalefactor));
         if(this.alreadycleared === false){
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
             this.gl.clearColor(this.clearcol.x, this.clearcol.y, this.clearcol.z, 1.0);
@@ -717,6 +725,11 @@ class Engine{
         const delta =  now - this.then;
         this.then = now;
         this.fps = 1 / delta;
+        this.mainpassfrm();
+        if(this.renewsh){
+            this.shfrm();
+            this.renewsh = false;
+        }
         requestAnimationFrame(framefunc);
     }
 }
@@ -934,7 +947,7 @@ class Mesh{
             if(engineh.useortho === false){
                 this.meshMat.buildperspectivemat(engineh.fov, 0.1, engineh.far, engineh.gl.canvas.width/engineh.gl.canvas.height);
             }else{
-                this.meshMat.buildorthomat(engineh.fov, -engineh.fov, engineh.fov / (engineh.gl.canvas.width/engineh.gl.canvas.height), -engineh.fov / (engineh.gl.canvas.width/engineh.gl.canvas.height), 0.1, engineh.far);
+                this.meshMat.buildorthomat(engineh.fov, -engineh.fov, engineh.fov / (window.screen.width/window.screen.height), -engineh.fov / (window.screen.width/window.screen.height), 0.1, engineh.far);
             }
             engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, "proj"), false, this.meshMat.mat);
 
