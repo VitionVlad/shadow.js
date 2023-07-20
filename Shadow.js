@@ -510,18 +510,11 @@ class Engine{
     getVersion(){
         return "2.2";
     }
-    constructor(id, postprocesfrag, resizetoscreen, autorotate, shadowres){
+    constructor(id, postprocesfrag, scalefactor, shadowres){
         this.canvas = document.querySelector(id);
-        if(resizetoscreen === true){
-            var xy = new vec2(window.screen.width, window.screen.height);
-            if(autorotate === true && xy.x < xy.y){
-                var lx = xy.x;
-                xy.x = xy.y;
-                xy.y = lx;
-            }
-            this.canvas.width = xy.x;
-            this.canvas.height = xy.y;
-        }
+        var xy = new vec2(Number(window.screen.width * scalefactor), Number(window.screen.height * scalefactor));
+        this.canvas.width = xy.x;
+        this.canvas.height = xy.y;
         this.gl = this.canvas.getContext("webgl2", { alpha: true });
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -941,7 +934,7 @@ class Mesh{
             if(engineh.useortho === false){
                 this.meshMat.buildperspectivemat(engineh.fov, 0.1, engineh.far, engineh.gl.canvas.width/engineh.gl.canvas.height);
             }else{
-                this.meshMat.buildorthomat(engineh.fov, -engineh.fov, engineh.fov, -engineh.fov, 0.1, engineh.far);
+                this.meshMat.buildorthomat(engineh.fov, -engineh.fov, engineh.fov / (engineh.gl.canvas.width/engineh.gl.canvas.height), -engineh.fov / (engineh.gl.canvas.width/engineh.gl.canvas.height), 0.1, engineh.far);
             }
             engineh.gl.uniformMatrix4fv(engineh.gl.getUniformLocation(this.shaderprog, "proj"), false, this.meshMat.mat);
 
