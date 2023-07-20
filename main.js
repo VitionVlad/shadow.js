@@ -4,7 +4,7 @@ function main(){
     document.body.style.cursor = 'none';
     const speed = 0.1;
     const sensivity = 1;
-    var eng = new Engine("#glcanvas", standartPostProces, true, true, 4000);
+    var eng = new Engine("#glcanvas", standartPostProces, 1, 4000);
     eng.useorthosh = true;
     eng.sfar = 100.0;
     eng.sfov = 15.0;
