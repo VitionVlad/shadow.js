@@ -65,7 +65,7 @@ void main(){
     }
     vec3 I = normalize(posit - -ppos);
     vec3 R = reflect(I, normalize(tbn*normal));
-    color = vec4(mix(finalcolor, texture(cubemap, R).gbr, texture(specular, xy).r/2.0), 1);
+    color = vec4(mix(finalcolor, texture(cubemap, R).gbr, texture(specular, xy).r/8.0), 1);
 }
 `;
 
@@ -508,7 +508,7 @@ class Engine{
         return degrees * Math.PI/180;
     }
     getVersion(){
-        return "2.3";
+        return "2.3.1";
     }
     mainpassfrm(){
         this.mainFramebuffer = this.gl.createFramebuffer();
@@ -516,7 +516,6 @@ class Engine{
         this.torendertex = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.torendertex);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, Number(window.screen.width * this.scalefactor), Number(window.screen.height * this.scalefactor), 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
-        console.log(window.screen.width);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
